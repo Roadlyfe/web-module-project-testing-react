@@ -5,6 +5,7 @@ import Display from './../Display';
 import userEvent from '@testing-library/user-event';
 
 import mockFetchShow from './../../api/fetchShow'
+import { WebpackOptionsDefaulter } from 'webpack';
 jest.mock('./../../api/fetchShow')
 
 const testShow = { 
@@ -24,8 +25,30 @@ const testShow = {
     ],
 }
 
-test('renders without errors with no props', async () => { });
+test('renders without errors with no props', async () => { 
     render(<Display/> )
-test('renders Show component when the button is clicked ', () => { });
+});
+   
+test('renders Show component when the button is clicked ', async () => { 
+    mockFetchShow.mockResolvedValueOnce(testShow)
 
-test('renders show season options matching your data when the button is clicked', () => { });
+    render(<Display/> )
+    const button = screen.getByRole('button')
+    userEvent.click(button)
+
+    const show = await screen.findByTestId('show-container')
+    expect(show).toBeInTheDocument()
+});
+
+test('renders show season options matching your data when the button is clicked', async () => { 
+    mockFetchShow.mockResolvedValueOnce(testShow)
+
+    render(<Display/> )
+    const button = screen.getByRole('button')
+    userEvent.click(button)
+
+    await waitFor(() => {
+    const seasonOptions = screen.queryAllByTestId('season-option')
+    expect(seasonOptions).toHaveLength(2)
+});
+})
